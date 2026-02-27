@@ -8,6 +8,24 @@ import os
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
+#----------------- FLASK CODE TRICK ---------------
+
+from flask import Flask
+from threading import Thread
+
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Help meee"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+
 # -------------------- CONFIG --------------------
 
 DATA_FILE = Path("data.json")
@@ -623,4 +641,9 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if not TOKEN:
         raise RuntimeError("DISCORD_TOKEN environment variable not set.")
+    
+    # 1. Start the Flask website in the background
+    keep_alive() 
+    
+    # 2. Start the Discord bot
     bot.run(TOKEN)
